@@ -2,10 +2,13 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
+	routes "github.com/suhas-developer07/WebscraperAndContenanalysis/internal"
 	"github.com/suhas-developer07/WebscraperAndContenanalysis/internal/database"
+	"github.com/suhas-developer07/WebscraperAndContenanalysis/internal/repository"
 )
 
 // --------Project Blueprint-------
@@ -17,6 +20,7 @@ import (
 // 3. Connect to RabbitMQ to publish message for each task to the queue. the message should be looks like this id and urls.
 
 func main() {
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -34,4 +38,14 @@ func main() {
 	}
 	defer Database.Close()
 
+	http.ListenAndServe(":8080", nil)
+
+	repo := repository.NewPostgresRepository(Database)
+	if err := repo.InitTable(); err != nil {
+		log.Fatalln("Error creating an table", err)
+	}
+
+	routes := routes.MountRoutes(*repo)
+
+	http.ListenAndServe(":8080", routes)
 }
