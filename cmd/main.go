@@ -38,14 +38,14 @@ func main() {
 	}
 	defer Database.Close()
 
-	http.ListenAndServe(":8080", nil)
-
 	repo := repository.NewPostgresRepository(Database)
+
 	if err := repo.InitTable(); err != nil {
-		log.Fatalln("Error creating an table", err)
+		log.Fatalln("Error initializing the table", err)
 	}
 
 	routes := routes.MountRoutes(*repo)
 
 	http.ListenAndServe(":8080", routes)
+
 }

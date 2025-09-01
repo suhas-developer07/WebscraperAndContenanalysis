@@ -26,12 +26,12 @@ func (r *PostgresRepository) InitTable() error {
 // here i need to insert the jobs to the table created above whenever request comes from the api
 
 type InsertJobsPayload struct {
-	urls []string
+	Urls []string `json:"url"`
 }
 
-func (r *PostgresRepository) InsertJobs(urls InsertJobsPayload) error {
+func (r *PostgresRepository) InsertJobs(payload InsertJobsPayload) error {
 	query := `INSERT INTO urls (url) VALUES ($1)`
 
-	_, err := r.db.Exec(query, pq.Array(urls))
+	_, err := r.db.Exec(query, pq.Array(payload.Urls))
 	return err
 }

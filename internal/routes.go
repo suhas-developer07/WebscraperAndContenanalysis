@@ -2,7 +2,6 @@ package routes
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -14,8 +13,6 @@ func MountRoutes(repo repository.PostgresRepository) *mux.Router {
 	handler := handlers.NewUrlHandler(&repo)
 
 	router := mux.NewRouter()
-
-	fmt.Print("woutes working")
 
 	router.HandleFunc("/", handler.InsertUrlHandler).Methods("POST")
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
