@@ -6,9 +6,11 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	routes "github.com/suhas-developer07/WebscraperAndContenanalysis/internal"
+
 	"github.com/suhas-developer07/WebscraperAndContenanalysis/internal/database"
+	"github.com/suhas-developer07/WebscraperAndContenanalysis/internal/rabbitmq"
 	"github.com/suhas-developer07/WebscraperAndContenanalysis/internal/repository"
+	"github.com/suhas-developer07/WebscraperAndContenanalysis/internal/routes"
 )
 
 // --------Project Blueprint-------
@@ -44,7 +46,14 @@ func main() {
 		log.Fatalln("Error initializing the table", err)
 	}
 
-	routes := routes.MountRoutes(*repo)
+	// rabbitMQ connection established
+	rabbitmqConn := NewRabbitmqConnection()
+	defer rabbitmqConn.conn.Close()
+	defer rabbitmqConn.chann.Close()
+
+	rabbitmqRepo := rabbitmq.NewRabbitmqRepo(rabbitmqConn.conn, rabbitmqConn.chann)
+
+	routes := routes.MountRoutes(*repo, *rabbitmqRepo)
 
 	http.ListenAndServe(":8080", routes)
 
