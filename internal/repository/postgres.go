@@ -29,9 +29,15 @@ type InsertJobsPayload struct {
 	Urls []string `json:"url"`
 }
 
-func (r *PostgresRepository) InsertJobs(payload InsertJobsPayload) error {
-	query := `INSERT INTO urls (url) VALUES ($1)`
+func (r *PostgresRepository) InsertJobs(payload InsertJobsPayload) (int64, []string, error) {
+	query := `INSERT INTO urls (url) VALUES ($1) RETURNING id, url`
+	var id int64
+	var urls []string
 
-	_, err := r.db.Exec(query, pq.Array(payload.Urls))
-	return err
+	err := r.db.QueryRow(query, pq.Array(payload.Urls)).Scan(&id, pq.Array(&urls))
+
+	if err != nil {
+		return 0, nil, err
+	}
+	return id, urls, err
 }
