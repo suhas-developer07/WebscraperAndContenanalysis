@@ -32,6 +32,21 @@ func NewRabbitmqConnection() *RabbitmqConnection {
 		log.Fatalln("failed to open rabbitmq channel , Error:", err.Error())
 	}
 
+	QUEUE_NAME := os.Getenv("QUEUE_NAME")
+
+	_, err = ch.QueueDeclare(
+		QUEUE_NAME,
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+
+	if err != nil {
+		log.Fatalln("failed to declare a queue", err)
+	}
+
 	log.Println("connected to rabbitMQ")
 	return &RabbitmqConnection{
 		conn:  conn,

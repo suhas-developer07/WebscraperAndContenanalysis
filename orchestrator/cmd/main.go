@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/joho/godotenv"
 
@@ -23,7 +24,9 @@ import (
 
 func main() {
 
-	err := godotenv.Load()
+	envPath := filepath.Join("..", ".env") // Go up one level from current directory
+
+	err := godotenv.Load(envPath)
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
