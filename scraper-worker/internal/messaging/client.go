@@ -65,25 +65,45 @@ func (c *Client) ConsumeTasks(queueName string) error {
 				d.Nack(false, true)
 				continue
 			}
-			log.Println(job)
 
 			var wg sync.WaitGroup
 
+			resultCh := make(chan models.ScrapedResult, len(job.URLs)) // creating the channel to collect all results from the goroutines
+
+			//process the task cuncurrently
 			for i, url := range job.URLs {
 				wg.Add(1)
-				go func(i int, url string) {
+				go func(taskID int, url string) {
 					defer wg.Done()
 					task := models.Task{
 						JobID:  job.ID,
-						TaskID: i + 1,
+						TaskID: taskID,
 						URL:    url,
 					}
 
 					result := c.worker.ProcessTask(task)
-					log.Println(result)
-				}(i, url)
+
+					resultCh <- result //sending the result to channel
+					// TODO :push result into to the kafka
+
+					log.Printf("Processed URL %d/%d for Job %d", taskID, len(job.URLs), job.ID)
+				}(i+1, url)
 			}
-			wg.Wait()
+
+			//wait for all goroutine to complete in a seperate gorautine
+			//so we can close the result channel
+			go func() {
+				wg.Wait()
+				close(resultCh)
+			}()
+
+			// Collect and process all results from the channel
+			// This happens in the main goroutine for this message
+			for result := range resultCh {
+				// TODO : send each result to kafka
+				log.Printf("Results: TASK_ID:%d, URL:%s, RAW_TEXT:%s", result.TaskID, result.URL, result.RawText)
+
+			}
 			d.Ack(false)
 
 			log.Printf("Completed processing all tasks for Job ID :%d", job.ID)
