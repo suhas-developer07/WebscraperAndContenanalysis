@@ -20,7 +20,7 @@ func NewScraper() *Scraper {
 func (s *Scraper) ProcessTask(task models.Task) models.ScrapedResult {
 	result := models.ScrapedResult{
 		JobID:  task.JobID,
-		TaskID: task.JobID,
+		TaskID: task.TaskID,
 		URL:    task.URL,
 	}
 
