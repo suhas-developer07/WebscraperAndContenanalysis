@@ -8,7 +8,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/streadway/amqp"
-	"github.com/suhas-developer07/webScraperContentAnalysis/scraper-worker/internal/rabbitmq"
+	"github.com/suhas-developer07/webScraperContentAnalysis/scraper-worker/internal/messaging"
 )
 
 // Things to do
@@ -57,8 +57,12 @@ func main() {
 
 	defer ch.Close()
 
-	rabbitmqRepo := rabbitmq.NewRabbitMQRepo(conn, ch)
+	client := messaging.NewClient(conn, ch)
 
-	rabbitmqRepo.Consumer(queueName)
+	err = client.ConsumeTasks(queueName)
+
+	if err != nil {
+		log.Fatalln("Failed to start consuming :", err)
+	}
 
 }
