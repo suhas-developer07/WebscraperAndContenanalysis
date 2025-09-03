@@ -22,7 +22,7 @@ func NewRabbitmqRepo(conn *amqp.Connection, chann *amqp.Channel) *RabbitmqRepo {
 
 type Data struct {
 	ID  int64    `json:"id"`
-	URL []string `json:"url"`
+	URL []string `json:"urls"`
 }
 
 func (repo *RabbitmqRepo) SendURL(data Data) error {
