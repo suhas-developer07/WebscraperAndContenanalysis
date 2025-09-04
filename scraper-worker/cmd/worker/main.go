@@ -19,11 +19,7 @@ import (
 func main() {
 	fmt.Print("hello world")
 
-	// Get the absolute path to the .env file in the root directory
 	envPath := filepath.Join("..", ".env") // Go up one level from current directory
-
-	// Alternative: if you know the exact path relative to your executable
-	// envPath := "/path/to/your/project/.env"
 
 	// Load the .env file from the specified path
 	err := godotenv.Load(envPath)
@@ -57,7 +53,18 @@ func main() {
 
 	defer ch.Close()
 
-	client := messaging.NewClient(conn, ch)
+	bootstrapServers := os.Getenv("KAFKA_BOOTSTRAP_SERVICE")
+	kafkaTopic := os.Getenv("KAFKA_RAW_CONTENT_TOPIC")
+
+	kafkaProducer, err := messaging.NewKafkaProducer(bootstrapServers, kafkaTopic)
+
+	if err != nil {
+		log.Fatal("Failed to create kafka producer : %v", err)
+	}
+
+	defer kafkaProducer.Close()
+
+	client := messaging.NewClient(conn, ch, kafkaProducer)
 
 	err = client.ConsumeTasks(queueName)
 
