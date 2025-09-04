@@ -12,15 +12,17 @@ import (
 )
 
 type Client struct {
-	conn   *amqp.Connection
-	ch     *amqp.Channel
-	worker *worker.Scraper
+	conn          *amqp.Connection
+	ch            *amqp.Channel
+	worker        *worker.Scraper
+	kafkaProducer *KafkaProducer
 }
 
-func NewClient(conn *amqp.Connection, ch *amqp.Channel) *Client {
+func NewClient(conn *amqp.Connection, ch *amqp.Channel, KafkaProducer *KafkaProducer) *Client {
 	return &Client{
-		conn: conn,
-		ch:   ch,
+		conn:          conn,
+		ch:            ch,
+		kafkaProducer: KafkaProducer,
 	}
 }
 
@@ -84,8 +86,6 @@ func (c *Client) ConsumeTasks(queueName string) error {
 					result := c.worker.ProcessTask(task)
 
 					resultCh <- result //sending the result to channel
-					// TODO :push result into to the kafka
-
 					log.Printf("Processed URL %d/%d for Job %d", taskID, len(job.URLs), job.ID)
 				}(i+1, url)
 			}
@@ -101,8 +101,11 @@ func (c *Client) ConsumeTasks(queueName string) error {
 			// This happens in the main goroutine for this message
 			for result := range resultCh {
 				// TODO : send each result to kafka
-				log.Printf("Results: TASK_ID:%d, URL:%s, RAW_TEXT:%s", result.TaskID, result.URL, result.RawText)
-
+				err := c.kafkaProducer.SendResult(result)
+				if err != nil {
+					log.Printf("ERROR: Failed tp send result to kafka for Task %d:%v.Might need tp retry or push to DLQ", result.TaskID, err)
+				}
+				log.Printf("Task successfully sended to kafka:%d", result.TaskID)
 			}
 			d.Ack(false)
 
