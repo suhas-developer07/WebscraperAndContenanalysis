@@ -59,7 +59,7 @@ func main() {
 	kafkaProducer, err := messaging.NewKafkaProducer(bootstrapServers, kafkaTopic)
 
 	if err != nil {
-		log.Fatal("Failed to create kafka producer : %v", err)
+		log.Fatalf("Failed to create kafka producer : %v", err)
 	}
 
 	defer kafkaProducer.Close()

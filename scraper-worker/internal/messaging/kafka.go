@@ -18,12 +18,12 @@ type KafkaProducer struct {
 func NewKafkaProducer(bootstrapServers, topic string) (*KafkaProducer, error) {
 
 	configMap := &kafka.ConfigMap{
-		"bootstrapServers": bootstrapServers,
-		"acks":             "all",
-		"retries":          5,
-		"retry.backoff.ms": 1000,
-		"linger.ms":        10,
-		"compression.type": "snappy",
+		"bootstrap.servers": bootstrapServers,
+		"acks":              "all",
+		"retries":           5,
+		"retry.backoff.ms":  1000,
+		"linger.ms":         10,
+		"compression.type":  "snappy",
 	}
 
 	producer, err := kafka.NewProducer(configMap)
@@ -40,9 +40,9 @@ func NewKafkaProducer(bootstrapServers, topic string) (*KafkaProducer, error) {
 			switch ev := e.(type) {
 			case *kafka.Message:
 				if ev.TopicPartition.Error != nil {
-					log.Printf("Failed to deliver message to [%s]:%v\n", ev.TopicPartition, ev.TopicPartition.Error)
+					log.Printf("FAILED to deliver message to [%s]: %v\n", ev.TopicPartition, ev.TopicPartition.Error)
 				} else {
-					log.Printf("Successfully delivered message to [%s] (offset %d)\n", ev.TopicPartition.Topic, ev.TopicPartition.Offset)
+					log.Printf("Successfully delivered message to [%s] (offset %d)\n", *ev.TopicPartition.Topic, ev.TopicPartition.Offset)
 				}
 			case kafka.Error:
 				log.Printf("kafka producer error: %v\n", ev)
