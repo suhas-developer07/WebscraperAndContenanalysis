@@ -73,7 +73,8 @@ func (kp *KafkaProducer) SendResult(result models.ScrapedResult) error {
 			Topic:     &kp.topic,
 			Partition: kafka.PartitionAny,
 		},
-		Key: []byte(fmt.Sprintf("%d", result.JobID)), Value: jsonData,
+		Key:   []byte(fmt.Sprintf("%d", result.JobID)),
+		Value: jsonData,
 	}
 
 	/*
