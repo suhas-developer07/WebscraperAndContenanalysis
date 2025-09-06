@@ -48,7 +48,7 @@ func (s *Scraper) ProcessTask(task models.Task) models.ScrapedResult {
 
 	c.OnError(func(r *colly.Response, err error) {
 		result.Error = err.Error()
-		log.Printf("Request URL :%s failed with response :%v error :%v", r.Request.URL, r, err)
+		log.Printf("Request URL :%s failed with response :%v error :%v", r.Request.URL, *r, err)
 	})
 
 	err := c.Visit(task.URL)
