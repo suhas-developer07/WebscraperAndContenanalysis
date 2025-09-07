@@ -101,6 +101,7 @@ func (c *Client) ConsumeTasks(queueName string) error {
 			// This happens in the main goroutine for this message
 			for result := range resultCh {
 				// TODO : send each result to kafka
+				log.Println("Raw_text:", result.RawText)
 				err := c.kafkaProducer.SendResult(result)
 				if err != nil {
 					log.Printf("ERROR: Failed tp send result to kafka for Task %d:%v.Might need tp retry or push to DLQ", result.TaskID, err)

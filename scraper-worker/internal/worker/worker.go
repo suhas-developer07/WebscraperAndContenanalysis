@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"
 	"github.com/suhas-developer07/webScraperContentAnalysis/scraper-worker/internal/models.go"
 )
@@ -38,17 +39,26 @@ func (s *Scraper) ProcessTask(task models.Task) models.ScrapedResult {
 	})
 
 	c.OnHTML("body", func(h *colly.HTMLElement) {
+		h.DOM.Find("script, style, nav, header, footer").Each(func(i int, s *goquery.Selection) {
+			s.Remove()
+		})
 
-		text := h.Text
-
+		text := h.DOM.Find("p").Text()
 		if text != "" {
 			textParts = append(textParts, strings.TrimSpace(text))
 		}
+
 	})
 
 	c.OnError(func(r *colly.Response, err error) {
 		result.Error = err.Error()
-		log.Printf("Request URL :%s failed with response :%v error :%v", r.Request.URL, *r, err)
+
+		log.Printf("Request failed | URL: %s | Status: %d | Error: %v | Body: %s",
+			r.Request.URL,
+			r.StatusCode,
+			err,
+			string(r.Body),
+		)
 	})
 
 	err := c.Visit(task.URL)

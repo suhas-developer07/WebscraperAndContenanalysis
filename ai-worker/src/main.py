@@ -11,6 +11,8 @@ from dotenv import load_dotenv
 from pathlib import Path
 import json
 from confluent_kafka import Consumer, KafkaError
+from groq import Groq
+from Groq import analyze_with_groq
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 dotenv_path = BASE_DIR.parent / ".env"
@@ -19,8 +21,10 @@ load_dotenv(dotenv_path)
 
 kafka_bootstrap_service = os.getenv("KAFKA_BOOTSTRAP_SERVICE")
 kafka_topic = os.getenv("KAFKA_RAW_CONTENT_TOPIC")
-print("KAFKA_BOOTSTRAP_SERVICE:",kafka_bootstrap_service)
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+
+#kafka initialization
 consumer_conf = {
     "bootstrap.servers":kafka_bootstrap_service,
     "group.id":"ai-worker-group",
@@ -30,6 +34,10 @@ consumer_conf = {
 consumer = Consumer(consumer_conf)
 consumer.subscribe([kafka_topic])
 print(f" Listening for messages on topic: {kafka_topic}")
+
+#Groq client 
+client = Groq(api_key=GROQ_API_KEY)
+print("Connected to Groq api")
 
 try:
     while True:
@@ -46,8 +54,7 @@ try:
         raw_value = msg.value().decode("utf-8")
         try:
             data = json.loads(raw_value)
-            print("Recieved:",data)
-
+           
             job_id = data.get("job_id")
             task_id = data.get("task_id")
             url = data.get("url")
@@ -56,8 +63,11 @@ try:
 
             print(f" JobID: {job_id}, TaskID: {task_id}, URL: {url}")
 
-            if error:
-                print("f Error:{error}")
+            if error and raw_text == "":
+                print(f"Error:{error}")
+            else:
+                analysis_result = analyze_with_groq(raw_text,client)
+                print(analysis_result)
         
         except json.JSONDecodeError as e:
             print("f Failed to parse JSON:{raw_value},error:{e}")
