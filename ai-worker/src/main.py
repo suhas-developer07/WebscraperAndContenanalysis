@@ -12,6 +12,7 @@ from pathlib import Path
 import json
 from confluent_kafka import Consumer, KafkaError
 from groq import Groq
+from elasticsearch import ElasticSearch,helpers
 from Groq import analyze_with_groq
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,6 +23,7 @@ load_dotenv(dotenv_path)
 kafka_bootstrap_service = os.getenv("KAFKA_BOOTSTRAP_SERVICE")
 kafka_topic = os.getenv("KAFKA_RAW_CONTENT_TOPIC")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+elasticSearch_host = os.getenv("ELASTICSEARCH_HOST","localhost")
 
 
 #kafka initialization
@@ -38,6 +40,11 @@ print(f" Listening for messages on topic: {kafka_topic}")
 #Groq client 
 client = Groq(api_key=GROQ_API_KEY)
 print("Connected to Groq api")
+
+es = ElasticSearch(
+    [f"http://{elasticSearch_host}:9200"],
+    request_timeout=30
+) 
 
 try:
     while True:

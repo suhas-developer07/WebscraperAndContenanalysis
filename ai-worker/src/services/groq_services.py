@@ -1,11 +1,23 @@
+from groq import Groq
 import json
+from typing import Dict, Any
+from ..models.schemas import AnalysisResult
 
-def create_analysis_prompt(raw_text):
-    """
-    Creates a universal, robust prompt for AI analysis of any web content.
-    Handles articles, error pages, lists, and non-text content intelligently.
-    """
-    prompt = f"""
+class GroqService:
+    def __init__(self, api_key: str):
+        self.client = Groq(api_key=api_key)
+    
+    def truncate_text(self, text: str, max_tokens: int = 3000) -> str:
+        """Truncate text to fit within token limits"""
+        max_chars = max_tokens * 4
+        truncated = text[:max_chars]
+        if len(text) > max_chars:
+            truncated += "... [text truncated]"
+        return truncated
+    
+    def create_prompt(self, text: str) -> str:
+        """Create analysis prompt"""
+        return f"""
 ### ROLE ###
 You are a skilled content analyst. Your task is to analyze provided text from any webpage and extract structured information.
 
@@ -66,59 +78,31 @@ THEN use the FALLBACK RESPONSE:
     "sentiment_tone": "Informative | Positive | Negative | Neutral | Critical | Promotional | Opinionated"
 }}
 """
-    return prompt
-
-def truncate_text_for_ai(raw_text, max_tokens=4000):
-    """
-    Pre-processes the raw text from the scraper to make it suitable for AI analysis.
-    1. Extracts only the visible article text (ignoring scripts, navbars, etc.)
-    2. Truncates it to a token limit safe for the AI API.
-    """
-    # A simple but effective way to get cleaner text: take the first N characters.
-    # This assumes the most relevant content is at the beginning of the scraped text.
-    # A more advanced method would use a library like `readability` or `bs4` to extract article body.
     
-    # Convert max_tokens to a rough character count (approx 4 chars per token)
-    max_characters = max_tokens * 4
-    
-    # Truncate the text to the calculated character limit
-    truncated_text = raw_text[:max_characters]
-    
-    # Optional: Add an ellipsis to indicate the text was truncated
-    if len(raw_text) > max_characters:
-        truncated_text += "... [text truncated due to length]"
-    
-    return truncated_text
-
-def analyze_with_groq(raw_text,client):
-    """
-    Analyzes raw text from any URL. Handles errors and junk data gracefully.
-    """
-
-    processed_text = truncate_text_for_ai(raw_text,max_tokens=3000)
-    try:
-       
-        prompt = create_analysis_prompt(processed_text)
-        
-        # 2. Call the Groq API
-        chat_completion = client.chat.completions.create(
-            messages=[{"role": "user", "content": prompt}],
-            model="llama-3.1-8b-instant",
-            temperature=0.1,
-            max_tokens=800,
-            response_format={"type": "json_object"}   
-        )
-        
-       
-        response_json = json.loads(chat_completion.choices[0].message.content)
-        return response_json
-
-    except json.JSONDecodeError:
-        # This catches if the AI doesn't return valid JSON
-        print("ERROR: AI response was not valid JSON.")
-        return {"category": "Unknown", "summary": "Analysis error: invalid JSON", "keywords": ""}
-    except Exception as e:
-        # This catches network errors, API errors, etc.
-        print(f"ERROR: Groq API call failed: {e}")
-        return {"category": "Unknown", "summary": f"Analysis error: {str(e)}", "keywords": ""}# Example usage:
-
+    def analyze_content(self, text: str) -> AnalysisResult:
+        """Analyze content using Groq API"""
+        try:
+            processed_text = self.truncate_text(text)
+            prompt = self.create_prompt(processed_text)
+            
+            response = self.client.chat.completions.create(
+                messages=[{"role": "user", "content": prompt}],
+                model="llama-3.1-8b-instant",
+                temperature=0.1,
+                max_tokens=800,
+                response_format={"type": "json_object"}
+            )
+            
+            result_data = json.loads(response.choices[0].message.content)
+            return AnalysisResult(**result_data)
+            
+        except Exception as e:
+            print(f" Groq analysis failed: {e}")
+            # Return fallback result
+            return AnalysisResult(
+                content_type="Non-Article",
+                domain_category="Unknown",
+                summary=f"Analysis failed: {str(e)}",
+                key_entities=[],
+                sentiment_tone="Neutral"
+            )
