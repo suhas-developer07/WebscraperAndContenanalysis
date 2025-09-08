@@ -1,7 +1,7 @@
 from typing import Dict, Any
-from ..services.groq_services import GroqService
-from ..services.elasticSearch_services import ElasticsearchService
-from ..models.schemas import ScrapedData, ElasticsearchDocument
+from services.groq_services import GroqService
+from services.elasticSearch_services import ElasticsearchService
+from models.schemas import ScrapedData, ElasticsearchDocument
 
 class ContentProcessor:
     def __init__(self, groq_service: GroqService, es_service: ElasticsearchService):

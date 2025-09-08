@@ -1,6 +1,5 @@
 from elasticsearch import Elasticsearch
 from typing import Dict, Any
-import logging
 
 class ElasticsearchService:
     def __init__(self, host: str, index_name: str):
@@ -13,7 +12,14 @@ class ElasticsearchService:
     def connect(self):
         """Connect to Elasticsearch"""
         try:
-            self.es = Elasticsearch([self.host], request_timeout=30)
+              # For Elasticsearch 8.x with security disabled
+            self.es = Elasticsearch(
+            [self.host],
+            request_timeout=30,
+            verify_certs=False,    # Disable SSL verification
+            ssl_show_warn=False,   # Disable SSL warnings
+            basic_auth=('elastic', '') if 'elasticsearch' in self.host else None
+            )
             if not self.es.ping():
                 raise ConnectionError("Failed to connect to Elasticsearch")
             print(" Connected to Elasticsearch successfully")

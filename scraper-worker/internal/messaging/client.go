@@ -104,7 +104,7 @@ func (c *Client) ConsumeTasks(queueName string) error {
 				if result.RawText == "" {
 					continue
 					//TODO:something i should do here
-					// rather than sending enpty extracted text to kafka drop it here itself
+					// rather than sending empty extracted text to kafka drop it here itself
 				}
 				err := c.kafkaProducer.SendResult(result)
 				if err != nil {

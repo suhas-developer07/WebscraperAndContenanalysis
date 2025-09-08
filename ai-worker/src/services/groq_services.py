@@ -1,7 +1,7 @@
 from groq import Groq
 import json
 from typing import Dict, Any
-from ..models.schemas import AnalysisResult
+from models.schemas import AnalysisResult  # Remove any src. prefix
 
 class GroqService:
     def __init__(self, api_key: str):
