@@ -52,7 +52,7 @@ class ElasticsearchService:
                 }
             }
             self.es.indices.create(index=self.index_name, body=index_settings)
-            print(f"✅ Created index: {self.index_name}")
+            print(f" Created index: {self.index_name}")
     
     def index_document(self, document: Dict[str, Any], doc_id: str = None):
         """Index a document in Elasticsearch"""
@@ -62,8 +62,8 @@ class ElasticsearchService:
                 id=doc_id,
                 document=document
             )
-            print(f"✅ Document indexed with ID: {response['_id']}")
+            print(f" Document indexed with ID: {response['_id']}")
             return response
         except Exception as e:
-            print(f"❌ Failed to index document: {e}")
+            print(f" Failed to index document: {e}")
             raise

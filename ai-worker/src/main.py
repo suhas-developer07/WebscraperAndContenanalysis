@@ -97,8 +97,8 @@ def main():
     load_environment()
     settings = get_settings()
     
-    print("🚀 Starting AI Worker Service...")
-    print(f"📊 Settings: {settings['elasticsearch_host']}, {settings['kafka_topic']}")
+    print(" Starting AI Worker Service...")
+    print(f" Settings: {settings['elasticsearch_host']}, {settings['kafka_topic']}")
     
     try:
         # Initialize services
@@ -117,7 +117,7 @@ def main():
         kafka_consumer.consume_messages(processor.process_message)
         
     except Exception as e:
-        print(f"❌ Failed to start service: {e}")
+        print(f" Failed to start service: {e}")
         raise
 
 if __name__ == "__main__":

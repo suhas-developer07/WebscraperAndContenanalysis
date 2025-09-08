@@ -14,12 +14,12 @@ class KafkaConsumerService:
     def subscribe(self, topics: list):
         """Subscribe to Kafka topics"""
         self.consumer.subscribe(topics)
-        print(f"✅ Subscribed to topics: {topics}")
+        print(f" Subscribed to topics: {topics}")
     
     def consume_messages(self, process_callback: Callable[[Dict[str, Any]], None]):
         """Consume messages and process them with callback"""
         try:
-            print("🚀 Starting Kafka consumer...")
+            print(" Starting Kafka consumer...")
             while True:
                 msg = self.consumer.poll(1.0)
                 
@@ -30,7 +30,7 @@ class KafkaConsumerService:
                     if msg.error().code() == KafkaError._PARTITION_EOF:
                         continue
                     else:
-                        print(f"❌ Kafka error: {msg.error()}")
+                        print(f" Kafka error: {msg.error()}")
                         break
                 
                 try:
@@ -38,11 +38,11 @@ class KafkaConsumerService:
                     process_callback(message_data)
                     
                 except json.JSONDecodeError as e:
-                    print(f"❌ Failed to parse JSON message: {e}")
+                    print(f" Failed to parse JSON message: {e}")
                 except Exception as e:
-                    print(f"❌ Error processing message: {e}")
+                    print(f" Error processing message: {e}")
                     
         except KeyboardInterrupt:
-            print("🛑 Stopping consumer...")
+            print(" Stopping consumer...")
         finally:
             self.consumer.close()
