@@ -23,7 +23,7 @@ class ElasticsearchDocument(BaseModel):
     job_id: int
     task_id: int
     url: str
-    raw_text: str
+  #  raw_text: str
     content_type: str
     domain_category: str
     summary: str
@@ -39,7 +39,7 @@ class ElasticsearchDocument(BaseModel):
             job_id=scraped_data.job_id,
             task_id=scraped_data.task_id,
             url=scraped_data.url,
-            raw_text=scraped_data.raw_text,
+          #  raw_text=scraped_data.raw_text,
             content_type=analysis_result.content_type,
             domain_category=analysis_result.domain_category,
             summary=analysis_result.summary,

@@ -17,9 +17,10 @@ func main() {
 
 	http.HandleFunc("/search", searchHandler.HandleSearch)
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("✅ Healthy"))
+		w.Write([]byte(" Healthy"))
 	})
 
-	log.Println("🚀 Query Service running on :8081")
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	log.Println(" Query Service running on :17029")
+	log.Fatal(http.ListenAndServe(":17029", nil))
 }
+

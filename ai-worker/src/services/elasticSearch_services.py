@@ -1,11 +1,17 @@
 from elasticsearch import Elasticsearch
 from typing import Dict, Any
 
+
+
 class ElasticsearchService:
     def __init__(self, host: str, index_name: str):
         self.host = host
         self.index_name = index_name
-        self.es = None
+        self.es = Elasticsearch(
+            ["http://localhost:9200"],
+            request_timeout=30,
+            verify_certs=False
+        )
         self.connect()
         self.ensure_index_exists()
     
@@ -40,7 +46,7 @@ class ElasticsearchService:
                         "job_id": {"type": "integer"},
                         "task_id": {"type": "integer"},
                         "url": {"type": "keyword"},
-                        "raw_text": {"type": "text", "index": False},
+                       # "raw_text": {"type": "text", "index": False},
                         "content_type": {"type": "keyword"},
                         "domain_category": {"type": "keyword"},
                         "summary": {"type": "text"},
