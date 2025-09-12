@@ -75,6 +75,7 @@ func (c *Client) ConsumeTasks(queueName string) error {
 			//process the task cuncurrently
 			for i, url := range job.URLs {
 				wg.Add(1)
+				log.Println("urls:", url)
 				go func(taskID int, url string) {
 					defer wg.Done()
 					task := models.Task{
@@ -102,6 +103,7 @@ func (c *Client) ConsumeTasks(queueName string) error {
 			for result := range resultCh {
 
 				if result.RawText == "" {
+					log.Println("Dropping The Job becouse of not extracting any texts")
 					continue
 					//TODO:something i should do here
 					// rather than sending empty extracted text to kafka drop it here itself

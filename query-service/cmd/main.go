@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 	"query-service/internal/elasticsearch"
@@ -13,6 +14,12 @@ func main() {
 		log.Fatalf("Failed to connect to Elasticsearch: %v", err)
 	}
 
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5173"},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: true,
+	})
+
 	searchHandler := search.NewHandler(esClient)
 
 	http.HandleFunc("/search", searchHandler.HandleSearch)
@@ -21,6 +28,5 @@ func main() {
 	})
 
 	log.Println(" Query Service running on :17029")
-	log.Fatal(http.ListenAndServe(":17029", nil))
+	log.Fatal(http.ListenAndServe(":17029", c.Handler(http.DefaultServeMux)))
 }
-

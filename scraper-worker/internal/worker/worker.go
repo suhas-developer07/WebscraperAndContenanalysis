@@ -75,6 +75,8 @@ func (s *Scraper) ProcessTask(task models.Task) models.ScrapedResult {
 
 	result.RawText = cleanedtext
 
+	log.Println(result)
+
 	return result
 }
 

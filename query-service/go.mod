@@ -4,7 +4,7 @@ go 1.24.4
 
 require (
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
-	github.com/elastic/go-elasticsearch/v9 v9.1.0
+	github.com/rs/cors v1.11.1
 )
 
 require (

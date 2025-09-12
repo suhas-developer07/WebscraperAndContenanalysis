@@ -1,0 +1,87 @@
+.navbar {
+  background: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nav-icon {
+  color: #3182ce;
+}
+
+.nav-brand h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-tab {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #718096;
+  transition: all 0.2s ease;
+}
+
+.nav-tab:hover {
+  background-color: #f7fafc;
+  color: #4a5568;
+}
+
+.nav-tab-active {
+  background-color: #3182ce;
+  color: white;
+}
+
+.nav-tab-active:hover {
+  background-color: #2c5282;
+}
+
+.tab-icon {
+  transition: transform 0.2s ease;
+}
+
+.nav-tab:hover .tab-icon {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .nav-tabs {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .nav-tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}

@@ -3,6 +3,7 @@ package rabbitmq
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/streadway/amqp"
@@ -61,6 +62,8 @@ func (repo *RabbitmqRepo) SendURL(data Data) error {
 	if err != nil {
 		return fmt.Errorf("failed to publish message: %w", err)
 	}
+
+	log.Println("Url Published to rabbitMQ")
 
 	return nil
 }

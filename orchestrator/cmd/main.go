@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 
 	"github.com/suhas-developer07/WebscraperAndContenanalysis/internal/database"
 	"github.com/suhas-developer07/WebscraperAndContenanalysis/internal/rabbitmq"
@@ -43,6 +44,13 @@ func main() {
 	}
 	defer Database.Close()
 
+	//Configure cors
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5173"},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: true,
+	})
+
 	repo := repository.NewPostgresRepository(Database)
 
 	if err := repo.InitTable(); err != nil {
@@ -58,6 +66,8 @@ func main() {
 
 	routes := routes.MountRoutes(*repo, *rabbitmqRepo)
 
-	http.ListenAndServe(":8080", routes)
+	handler := c.Handler(routes)
+
+	http.ListenAndServe(":8080", handler)
 
 }

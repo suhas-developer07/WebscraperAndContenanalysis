@@ -31,6 +31,8 @@ func NewKafkaProducer(bootstrapServers, topic string) (*KafkaProducer, error) {
 		return nil, fmt.Errorf("failed to create kafka producer : %w", err)
 	}
 
+	log.Println("Connected to Kafka...")
+
 	/*
 		    starts goroutine to handle delivery reports (success/errors).
 			this function is critical for understanding fate of our message

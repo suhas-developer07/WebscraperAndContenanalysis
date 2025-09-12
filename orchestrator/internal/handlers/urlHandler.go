@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/suhas-developer07/WebscraperAndContenanalysis/internal/rabbitmq"
@@ -33,7 +34,7 @@ func (h *UrlHandler) InsertUrlHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	log.Println("URL:",urls)
 	msg := rabbitmq.Data{
 		ID:  id,
 		URL: urls,
